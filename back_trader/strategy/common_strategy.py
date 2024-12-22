@@ -1,5 +1,5 @@
 import backtrader as bt
-from public import commission
+from simulation_setting import commission, do_log_print
 
 
 class commonStrategy(bt.Strategy):
@@ -20,25 +20,24 @@ class commonStrategy(bt.Strategy):
         if order.status in [order.Completed]:
             if order.isbuy():
                 self.log(
-                    'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f, Date: %s' %
+                    'BUY EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
                     (order.executed.price,
                      order.executed.value,
-                     order.executed.comm,
-                     order.data.datetime.date(0)))
+                     order.executed.comm))
 
                 self.buyprice = order.executed.price
                 self.buycomm = order.executed.comm
             else:  # Sell
-                self.log('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f, Date: %s' %
+                self.log('SELL EXECUTED, Price: %.2f, Cost: %.2f, Comm %.2f' %
                          (order.executed.price,
                           order.executed.value,
-                          order.executed.comm,
-                          order.data.datetime.date(0)))
+                          order.executed.comm))
 
             self.bar_executed = len(self)
 
         elif order.status in [order.Canceled, order.Margin, order.Rejected]:
-            self.log('Order Canceled/Margin/Rejected')
+            order_status = order.getstatusname()
+            self.log('Order: %s' % order_status)
 
         self.order = None
 
@@ -46,13 +45,14 @@ class commonStrategy(bt.Strategy):
         if not trade.isclosed:
             return
 
-        self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f' %
+        self.log('OPERATION PROFIT, GROSS %.2f, NET %.2f\n' %
                  (trade.pnl, trade.pnlcomm))
 
-    def log(self, txt, dt=None, doPrint=False):
+    def log(self, txt, dt=None, doPrint=do_log_print):
         if doPrint:
             dt = dt or self.data.datetime[0]
-            print('%s, %s' % (dt, txt))
+            dt_str = bt.num2date(dt).strftime('%Y-%m-%d %H:%M:%S')
+            print('%s, %s' % (dt_str, txt))
 
-    def stop(self):
-        print(self.broker.get_value())
+    # def stop(self):
+    #     print(self.broker.get_value())

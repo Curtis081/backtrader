@@ -131,6 +131,5 @@ dmypy.json
 # user add
 .idea/
 
-# Backtest plot *.html
-SmaCross.html
-BuyAndSellStrategy.html
+# backtrader
+best_params.txt

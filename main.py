@@ -1,23 +1,25 @@
 import backtrader as bt
+import backtrader.analyzers as btanalyzers
+import itertools
+import os
 
-
-from back_trader.fetch_data_for_bt import GetDataFromYahoo
+from back_trader.fetch_data_for_bt import get_data_from_yahoo
 from back_trader.strategy.buy_and_hold import BuyAndHold
 from back_trader.strategy.sma import SmaCross
 from back_trader.strategy.vix import vixCross
-from public import commission
+from simulation_setting import initial_cash, commission, start_date, end_date
 
 
-def backtrader_with_strategy(data_feed, strategy):
-    # 創建一個 Cerebro 引擎
+def backtrader_with_strategy(data_feed, strategy, strategy_params=None):
     cerebro = bt.Cerebro()
     cerebro.adddata(data_feed)
-    cerebro.adddata(vix, name='VIX')
 
-    # 添加策略
-    cerebro.addstrategy(strategy)
+    if strategy_params is None:
+        cerebro.addstrategy(strategy)
+    else:
+        cerebro.addstrategy(strategy, strategy_params)
 
-    # # 添加 Broker 觀察者
+    # 添加 Broker 觀察者
     # cerebro.addobserver(bt.observers.Broker)
     #
     # # 添加 BuySell 觀察者，標記交易點
@@ -25,40 +27,90 @@ def backtrader_with_strategy(data_feed, strategy):
 
     # cerebro.addsizer(bt.sizers.AllInSizer)
 
-    # 設定初始現金
-    cerebro.broker.setcash(100000.0)
+    # Set initial cash
+    cerebro.broker.setcash(initial_cash)
 
-    # 設定每次交易的手續費
-    cerebro.broker.setcommission(commission=commission)
+    # Set commission
+    cerebro.broker.setcommission(commission=commission, margin=1)
 
-    result = cerebro.run()
+    # Analyzer
+    cerebro.addanalyzer(btanalyzers.AnnualReturn, _name='annual_return')
+    cerebro.addanalyzer(btanalyzers.PyFolio, _name='pyfolio')
+    cerebro.addanalyzer(btanalyzers.PeriodStats, _name='period_stats')
+    cerebro.addanalyzer(btanalyzers.Returns, _name='returns', tann=252)
+    cerebro.addanalyzer(btanalyzers.TimeReturn, _name='time_return')
 
-    # 繪製結果
+    thestrats = cerebro.run()
+    thestrat = thestrats[0]
+    annual_return = thestrat.analyzers.annual_return.get_analysis()
+    pyfolio = thestrat.analyzers.pyfolio.get_analysis()
+    period_stats = thestrat.analyzers.period_stats.get_analysis()
+    returns = thestrat.analyzers.returns.get_analysis()
+    time_return = thestrat.analyzers.time_return.get_analysis()
+
+    final_value = cerebro.broker.getvalue()
+    total_return = (final_value - initial_cash) / initial_cash * 100
+    print(total_return)
+
     cerebro.plot()
 
+    return total_return
 
-def get_vix(start_date, end_date):
-    # start_date = self.datas[0].datetime.datetime(1).strftime('%Y-%m-%d')
-    # end_date = self.datas[0].datetime.datetime(0).strftime('%Y-%m-%d')
 
-    # 定義 VIX 指數的代碼
-    vix_symbol = "^VIX"
-    # 下載 VIX 歷史數據
-    vix_data = GetDataFromYahoo(vix_symbol, start_date, end_date)
+def delete_file_if_exists(file_path):
+    """
+    If the file exists, delete the file.
 
-    # 將數據保存為 CSV 檔案
-    # vix_data.to_csv("vix_historical_data.csv")
+    :param file_path: str, target file path
+    """
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"file {file_path} deleted")
+    else:
+        print(f"file {file_path} does not exist, no need to delete")
 
-    return vix_data
+
+def write_dict_to_file(file_path, data, header=None):
+    """
+    Write a dictionary to a file. If the file does not exist, add a header.
+
+    :param file_path: str, target file path
+    :param data: dict, need to write dictionary
+    :param header: str, optional, file header(only write when file does not exist)
+    """
+    file_exists = os.path.exists(file_path)
+
+    with open(file_path, "a") as file:
+        if not file_exists and header:
+            file.write(header + "\n")
+            file.write("-" * len(header) + "\n")
+
+        file.write(f"\n")
+        for key, value in data.items():
+            file.write(f"{key}: {value}\n")
+
+    print(f"dirctory contents written to {file_path}")
 
 
 if __name__ == '__main__':
     ticker = 'SPY'
-    start_date = '1993-02-01'
-    end_date = '2020-12-01'
-
-    data_feed = GetDataFromYahoo(ticker, start_date, end_date)
-    vix = get_vix(start_date, end_date)
+    data_feed = get_data_from_yahoo(ticker, start_date, end_date)
 
     backtrader_with_strategy(data_feed, BuyAndHold)
-    backtrader_with_strategy(data_feed, vixCross)
+
+    params = {'rolling_days': 1, 'vix_th': 44}
+    backtrader_with_strategy(data_feed, vixCross, strategy_params=params)
+
+    # file_path = "best_params.txt"
+    # delete_file_if_exists(file_path)
+    # best_params = {'rolling_days': 1, 'vix_th': 1, 'total_return': 0}
+    # for rolling_days, vix_th in itertools.product(range(1, 2), range(1, 100, 1)):
+    #     params = {'rolling_days': rolling_days, 'vix_th': vix_th}
+    #     total_return = backtrader_with_strategy(data_feed, vixCross, strategy_params=params)
+    #     if total_return > best_params['total_return']:
+    #         best_params['rolling_days'] = rolling_days
+    #         best_params['vix_th'] = vix_th
+    #         best_params['total_return'] = total_return
+    #         print(f'rolling_days: {rolling_days}, vix_th: {vix_th}, total_return: {total_return}')
+    #         write_dict_to_file(file_path, best_params, header="")
+    # print(best_params)

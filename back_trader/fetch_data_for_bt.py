@@ -3,7 +3,7 @@ import pandas as pd
 import backtrader as bt
 
 
-def GetDataFromYahoo(ticker, start_date, end_date):
+def fetch_data_from_yahoo(ticker, start_date, end_date):
     # Fetch data from Yahoo Finance
     df = yf.download(ticker, start=start_date, end=end_date)
 
@@ -23,6 +23,10 @@ def GetDataFromYahoo(ticker, start_date, end_date):
     # Set 'datetime' as the index
     df.set_index('datetime', inplace=True)
 
+    return df
+
+
+def convert_to_backtrader_data_format(df):
     # Convert to Backtrader data format
     data = bt.feeds.PandasData(
         dataname=df,
@@ -34,5 +38,12 @@ def GetDataFromYahoo(ticker, start_date, end_date):
         volume='Volume',
         openinterest=None  # No open interest
     )
+
+    return data
+
+
+def get_data_from_yahoo(ticker, start_date, end_date):
+    df = fetch_data_from_yahoo(ticker, start_date, end_date)
+    data = convert_to_backtrader_data_format(df)
 
     return data
