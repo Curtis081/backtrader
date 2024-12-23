@@ -133,3 +133,4 @@ dmypy.json
 
 # backtrader
 best_params.txt
+greater_than_buy_and_hold_params.txt
