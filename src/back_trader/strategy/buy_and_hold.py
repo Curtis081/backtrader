@@ -1,4 +1,4 @@
-from back_trader.strategy.common_strategy import commonStrategy
+from src.back_trader.strategy.common_strategy import commonStrategy
 
 
 class BuyAndHold(commonStrategy):

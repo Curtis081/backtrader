@@ -1,8 +1,11 @@
 import backtrader as bt
-from simulation_setting import commission, do_log_print
+from src.simulation_setting import commission, do_log_print
 
 
 class commonStrategy(bt.Strategy):
+    """
+    The commonStrategy class is for other strategies to inherit from.
+    """
     def __init__(self):
         pass
 

@@ -4,6 +4,18 @@ import backtrader as bt
 
 
 def fetch_data_from_yahoo(ticker, start_date, end_date):
+    """
+        The fetch_data_from_yahoo function fetches historical data for a given ticker from Yahoo Finance.
+        It returns a Pandas DataFrame containing the historical data.
+
+        :Parameters:
+        ticker: The ticker symbol of the stock.
+        start_date: The start date for the historical data.
+        end_date: The end date for the historical data.
+
+        :return:
+        df: The Pandas DataFrame containing the historical data.
+    """
     # Fetch data from Yahoo Finance
     df = yf.download(ticker, start=start_date, end=end_date)
 
@@ -27,7 +39,15 @@ def fetch_data_from_yahoo(ticker, start_date, end_date):
 
 
 def convert_to_backtrader_data_format(df):
-    # Convert to Backtrader data format
+    """
+        Converts a Pandas DataFrame to the Backtrader data format.
+
+        :Parameters:
+        df: The Pandas DataFrame containing the historical data.
+
+        :return:
+        data: The data in the Backtrader data format.
+    """
     data = bt.feeds.PandasData(
         dataname=df,
         datetime=None,  # Backtrader will automatically pick the index as datetime
@@ -43,6 +63,18 @@ def convert_to_backtrader_data_format(df):
 
 
 def get_data_from_yahoo(ticker, start_date, end_date):
+    """
+        The get_data_from_yahoo function fetches historical data for a given ticker from Yahoo Finance,
+        converts it to the Backtrader data format, and returns the data.
+
+        :Parameters:
+        ticker: The ticker symbol of the stock.
+        start_date: The start date for the historical data.
+        end_date: The end date for the historical data.
+
+        :return:
+        data: The data in the Backtrader data format.
+    """
     df = fetch_data_from_yahoo(ticker, start_date, end_date)
     data = convert_to_backtrader_data_format(df)
 

@@ -5,7 +5,6 @@ import os
 
 from back_trader.fetch_data_for_bt import get_data_from_yahoo
 from back_trader.strategy.buy_and_hold import BuyAndHold
-from back_trader.strategy.sma import SmaCross
 from back_trader.strategy.vix import vixCross
 from simulation_setting import initial_cash, commission, start_date, end_date
 
@@ -34,19 +33,20 @@ def backtrader_with_strategy(data_feed, strategy, cerebro_plot=True, strategy_pa
     cerebro.broker.setcommission(commission=commission, margin=1)
 
     # Analyzer
-    cerebro.addanalyzer(btanalyzers.AnnualReturn, _name='annual_return')
-    cerebro.addanalyzer(btanalyzers.PyFolio, _name='pyfolio')
-    cerebro.addanalyzer(btanalyzers.PeriodStats, _name='period_stats')
-    cerebro.addanalyzer(btanalyzers.Returns, _name='returns', tann=252)
-    cerebro.addanalyzer(btanalyzers.TimeReturn, _name='time_return')
+    # cerebro.addanalyzer(btanalyzers.AnnualReturn, _name='annual_return')
+    # cerebro.addanalyzer(btanalyzers.PyFolio, _name='pyfolio')
+    # cerebro.addanalyzer(btanalyzers.PeriodStats, _name='period_stats')
+    # cerebro.addanalyzer(btanalyzers.Returns, _name='returns', tann=252)
+    # cerebro.addanalyzer(btanalyzers.TimeReturn, _name='time_return')
 
     thestrats = cerebro.run()
-    thestrat = thestrats[0]
-    annual_return = thestrat.analyzers.annual_return.get_analysis()
-    pyfolio = thestrat.analyzers.pyfolio.get_analysis()
-    period_stats = thestrat.analyzers.period_stats.get_analysis()
-    returns = thestrat.analyzers.returns.get_analysis()
-    time_return = thestrat.analyzers.time_return.get_analysis()
+
+    # thestrat = thestrats[0]
+    # annual_return = thestrat.analyzers.annual_return.get_analysis()
+    # pyfolio = thestrat.analyzers.pyfolio.get_analysis()
+    # period_stats = thestrat.analyzers.period_stats.get_analysis()
+    # returns = thestrat.analyzers.returns.get_analysis()
+    # time_return = thestrat.analyzers.time_return.get_analysis()
 
     final_value = cerebro.broker.getvalue()
     total_return = (final_value - initial_cash) / initial_cash * 100
@@ -96,14 +96,14 @@ def write_dict_to_file(file_path, data, header=None):
     print(f"dirctory contents written to {file_path}")
 
 
-def best_params(buy_and_hold_total_return):
-    file_path = "best_params.txt"
-    file_path2 = "greater_than_buy_and_hold_params.txt"
+def best_params_calc(buy_and_hold_total_ret):
+    file_path = "../best_params.txt"
+    file_path2 = "../greater_than_buy_and_hold_params.txt"
     delete_file_if_exists(file_path)
     delete_file_if_exists(file_path2)
     best_params = {'rolling_days': 1, 'vix_th': 1, 'total_return': 0}
-    write_dict_to_file(file_path, 'buy_and_hold_total_return = ' + str(buy_and_hold_total_return), header="")
-    write_dict_to_file(file_path2, 'buy_and_hold_total_return = ' + str(buy_and_hold_total_return), header="")
+    write_dict_to_file(file_path, 'buy_and_hold_total_return = ' + str(buy_and_hold_total_ret), header="")
+    write_dict_to_file(file_path2, 'buy_and_hold_total_return = ' + str(buy_and_hold_total_ret), header="")
     counter = 0
     for rolling_days, vix_th in itertools.product(range(1, 2), range(1, 101, 1)):
         counter += 1
@@ -113,7 +113,7 @@ def best_params(buy_and_hold_total_return):
             best_params = {'rolling_days': rolling_days, 'vix_th': vix_th, 'total_return': total_return}
             print(best_params)
             write_dict_to_file(file_path, best_params, header="")
-        if total_return > buy_and_hold_total_return:
+        if total_return > buy_and_hold_total_ret:
             better_than_buy_and_hold_params = {'rolling_days': rolling_days, 'vix_th': vix_th,
                                                'total_return': total_return}
             print(f'better_than_buy_and_hold_params')
@@ -138,4 +138,4 @@ if __name__ == '__main__':
     # params = {'rolling_days': 1, 'vix_th': 34}  # start_date = '2021-01-01' # 2022 stock market crash # not best choice
     backtrader_with_strategy(data_feed, vixCross, strategy_params=params)
 
-    best_params(buy_and_hold_total_return)
+    best_params_calc(buy_and_hold_total_return)
