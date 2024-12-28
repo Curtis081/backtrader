@@ -1,15 +1,26 @@
 import backtrader as bt
-import backtrader.analyzers as btanalyzers
 import itertools
 
 from back_trader.fetch_data_for_bt import get_data_from_yahoo
 from back_trader.strategy.buy_and_hold import BuyAndHold
 from back_trader.strategy.vix import vixCross
 from simulation_setting import initial_cash, commission, start_date, end_date
-from txt_file_execution import delete_file_if_exists, write_dict_to_file
+from src.txt_file_execution import delete_file_if_exists, write_dict_to_file
 
 
 def backtrader_with_strategy(data_feed, strategy, cerebro_plot=True, strategy_params=None):
+    """
+    Run backtrader with a strategy.
+
+    :parameter:
+    - data_feed: DataFrame, stock price data
+    - strategy: class, strategy class
+    - cerebro_plot: bool, optional, plot the graph
+    - strategy_params: dict, optional, strategy parameters
+
+    :return:
+    - total_return: float, total return rate
+    """
     cerebro = bt.Cerebro()
     cerebro.adddata(data_feed)
 
@@ -55,8 +66,14 @@ def backtrader_with_strategy(data_feed, strategy, cerebro_plot=True, strategy_pa
 
 
 def best_params_calc(buy_and_hold_total_ret):
-    file_path = "../best_params.txt"
-    file_path2 = "../greater_than_buy_and_hold_params.txt"
+    """
+    Calculate the best parameters for the strategy.
+
+    :parameter:
+    - buy_and_hold_total_ret: float, buy and hold total return rate
+    """
+    file_path = "./best_params.txt"
+    file_path2 = "./greater_than_buy_and_hold_params.txt"
     delete_file_if_exists(file_path)
     delete_file_if_exists(file_path2)
     best_params = {'rolling_days': 1, 'vix_th': 1, 'total_return': 0}
@@ -89,4 +106,4 @@ if __name__ == '__main__':
     params = {'rolling_days': 1, 'vix_th': 51}  # COVID-19 and the march 2020 stock market crash
     backtrader_with_strategy(data_feed, vixCross, strategy_params=params)
 
-    # best_params_calc(buy_and_hold_total_return)
+    best_params_calc(buy_and_hold_total_return)
