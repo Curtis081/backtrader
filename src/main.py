@@ -1,12 +1,12 @@
 import backtrader as bt
 import backtrader.analyzers as btanalyzers
 import itertools
-import os
 
 from back_trader.fetch_data_for_bt import get_data_from_yahoo
 from back_trader.strategy.buy_and_hold import BuyAndHold
 from back_trader.strategy.vix import vixCross
 from simulation_setting import initial_cash, commission, start_date, end_date
+from txt_file_execution import delete_file_if_exists, write_dict_to_file
 
 
 def backtrader_with_strategy(data_feed, strategy, cerebro_plot=True, strategy_params=None):
@@ -18,12 +18,8 @@ def backtrader_with_strategy(data_feed, strategy, cerebro_plot=True, strategy_pa
     else:
         cerebro.addstrategy(strategy, strategy_params)
 
-    # 添加 Broker 觀察者
     # cerebro.addobserver(bt.observers.Broker)
-    #
-    # # 添加 BuySell 觀察者，標記交易點
     # cerebro.addobserver(bt.observers.BuySell)
-
     # cerebro.addsizer(bt.sizers.AllInSizer)
 
     # Set initial cash
@@ -50,50 +46,12 @@ def backtrader_with_strategy(data_feed, strategy, cerebro_plot=True, strategy_pa
 
     final_value = cerebro.broker.getvalue()
     total_return = (final_value - initial_cash) / initial_cash * 100
-    print(total_return)
+    print("total return rate = " + str(round(total_return, 3)) + "%")
 
     if cerebro_plot:
         cerebro.plot()
 
     return total_return
-
-
-def delete_file_if_exists(file_path):
-    """
-    If the file exists, delete the file.
-
-    :param file_path: str, target file path
-    """
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        print(f"file {file_path} deleted")
-    else:
-        print(f"file {file_path} does not exist, no need to delete")
-
-
-def write_dict_to_file(file_path, data, header=None):
-    """
-    Write a dictionary to a file. If the file does not exist, add a header.
-
-    :param file_path: str, target file path
-    :param data: dict, need to write dictionary
-    :param header: str, optional, file header(only write when file does not exist)
-    """
-    file_exists = os.path.exists(file_path)
-
-    with open(file_path, "a") as file:
-        if not file_exists and header:
-            file.write(header + "\n")
-            file.write("-" * len(header) + "\n")
-
-        if isinstance(data, dict):
-            file.write(f"\n")
-            for key, value in data.items():
-                file.write(f"{key}: {value}\n")
-        elif isinstance(data, str):
-            file.write(f"{data}\n")
-
-    print(f"dirctory contents written to {file_path}")
 
 
 def best_params_calc(buy_and_hold_total_ret):
@@ -126,16 +84,9 @@ def best_params_calc(buy_and_hold_total_ret):
 if __name__ == '__main__':
     ticker = 'SPY'
     data_feed = get_data_from_yahoo(ticker, start_date, end_date)
-
     buy_and_hold_total_return = backtrader_with_strategy(data_feed, BuyAndHold)
 
-    # 通常VIX指數超過40時，表示市場對未來的非理性恐慌
-    # params = {'rolling_days': 1, 'vix_th': 44}  # start_date = '1993-01-29' # SPY stock IPO
-    # params = {'rolling_days': 1, 'vix_th': 44}  # start_date = '1998-01-01' # 2000 stock market crash
-    # params = {'rolling_days': 1, 'vix_th': 44}  # start_date = '2004-03-29' # 2008 stock market crash
-    params = {'rolling_days': 1, 'vix_th': 51}  # start_date = '2010-10-09' # VOO stock for compare
-    # params = {'rolling_days': 1, 'vix_th': 51}  # start_date = '2019-01-01' # 2020 stock market crash
-    # params = {'rolling_days': 1, 'vix_th': 34}  # start_date = '2021-01-01' # 2022 stock market crash # not best choice
+    params = {'rolling_days': 1, 'vix_th': 51}  # COVID-19 and the march 2020 stock market crash
     backtrader_with_strategy(data_feed, vixCross, strategy_params=params)
 
-    best_params_calc(buy_and_hold_total_return)
+    # best_params_calc(buy_and_hold_total_return)

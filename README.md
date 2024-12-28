@@ -1,6 +1,6 @@
 ## Introduction(簡介)
+專題報告簡報:
+https://reurl.cc/36Kr79
+
 此套件的官網
 https://www.backtrader.com/docu/
-
-
-## 使用方法
