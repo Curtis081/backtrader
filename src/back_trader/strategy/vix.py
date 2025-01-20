@@ -2,7 +2,7 @@ import numpy as np
 
 from src.back_trader.fetch_data_for_bt import fetch_data_from_yahoo
 from src.back_trader.strategy.common_strategy import commonStrategy
-from src.simulation_setting import start_date, end_date
+from src.utilities.simulation_config import start_date, end_date
 
 
 def get_vix_history_data(_start_date, _end_date):
