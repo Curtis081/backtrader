@@ -8,7 +8,7 @@ from src.utilities.simulation_config import initial_cash, commission, start_date
 from src.utilities.manage_txt_file import delete_file_if_exists, write_dict_to_file
 
 
-def backtrader_with_strategy(data_feed, strategy, cerebro_plot=True, strategy_params=None):
+def backtrader_with_strategy(data, strategy, cerebro_plot=True, strategy_params=None):
     """
     Run backtrader with a strategy.
 
@@ -22,7 +22,7 @@ def backtrader_with_strategy(data_feed, strategy, cerebro_plot=True, strategy_pa
     - total_return: float, total return rate
     """
     cerebro = bt.Cerebro()
-    cerebro.adddata(data_feed)
+    cerebro.adddata(data)
 
     if strategy_params is None:
         cerebro.addstrategy(strategy)
@@ -65,7 +65,7 @@ def backtrader_with_strategy(data_feed, strategy, cerebro_plot=True, strategy_pa
     return total_return
 
 
-def best_params_calc(buy_and_hold_total_ret):
+def best_params_calc(data, buy_and_hold_total_ret):
     """
     Calculate the best parameters for the strategy.
 
@@ -82,8 +82,9 @@ def best_params_calc(buy_and_hold_total_ret):
     counter = 0
     for rolling_days, vix_th in itertools.product(range(1, 2), range(1, 101, 1)):
         counter += 1
-        params = {'rolling_days': rolling_days, 'vix_th': vix_th}
-        total_return = backtrader_with_strategy(data_feed, vixCross, cerebro_plot=False, strategy_params=params)
+        strategy_params = {'rolling_days': rolling_days, 'vix_th': vix_th}
+        total_return = backtrader_with_strategy(data, vixCross, cerebro_plot=False,
+                                                strategy_params=strategy_params)
         if total_return > best_params['total_return']:
             best_params = {'rolling_days': rolling_days, 'vix_th': vix_th, 'total_return': total_return}
             print(best_params)
@@ -103,7 +104,7 @@ if __name__ == '__main__':
     data_feed = get_data_from_yahoo(ticker, start_date, end_date)
     buy_and_hold_total_return = backtrader_with_strategy(data_feed, BuyAndHold)
 
-    params = {'rolling_days': 1, 'vix_th': 51}  # COVID-19 and the march 2020 stock market crash
+    params = {'rolling_days': 1, 'vix_th': 51}  # COVID-19 and the March 2020 stock market crash
     backtrader_with_strategy(data_feed, vixCross, strategy_params=params)
 
-    # best_params_calc(buy_and_hold_total_return)
+    best_params_calc(data_feed, buy_and_hold_total_return)
