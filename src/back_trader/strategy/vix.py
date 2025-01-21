@@ -1,7 +1,7 @@
 import numpy as np
 
 from src.back_trader.fetch_data_for_bt import fetch_data_from_yahoo
-from src.back_trader.strategy.common_strategy import commonStrategy
+from src.back_trader.strategy.common_strategy import CommonStrategy
 from src.utilities.simulation_config import start_date, end_date
 
 
@@ -67,10 +67,9 @@ def counter():
         counter_reg = counter_reg + 1
 
 
-
-class vixCross(commonStrategy):
+class vixCross(CommonStrategy):
     """
-        The vixCross class is a subclass of the commonStrategy class.
+        The vixCross class is a subclass of the CommonStrategy class.
         It is used to implement the VIX cross strategy.
         The strategy is to buy when the VIX crosses below a threshold and sell when the VIX crosses above the threshold.
 

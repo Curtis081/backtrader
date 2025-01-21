@@ -1,7 +1,7 @@
-from src.back_trader.strategy.common_strategy import commonStrategy
+from src.back_trader.strategy.common_strategy import CommonStrategy
 
 
-class BuyAndHold(commonStrategy):
+class BuyAndHold(CommonStrategy):
     def start(self):
         self.val_start = self.broker.get_cash()  # keep the starting cash
 

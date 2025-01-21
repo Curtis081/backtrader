@@ -2,9 +2,9 @@ import backtrader as bt
 from src.utilities.simulation_config import commission, do_log_print
 
 
-class commonStrategy(bt.Strategy):
+class CommonStrategy(bt.Strategy):
     """
-    The commonStrategy class is for other strategies to inherit from.
+    The CommonStrategy class is for other strategies to inherit from.
     It contains the common methods and attributes that are used in the strategies.
     """
     def __init__(self):
