@@ -107,4 +107,4 @@ if __name__ == '__main__':
     params = {'rolling_days': 1, 'vix_th': 51}  # COVID-19 and the March 2020 stock market crash
     backtrader_with_strategy(data_feed, vixCross, strategy_params=params)
 
-    best_params_calc(data_feed, buy_and_hold_total_return)
+    # best_params_calc(data_feed, buy_and_hold_total_return)

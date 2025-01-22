@@ -7,7 +7,7 @@
 |&nbsp;&nbsp;&nbsp;&nbsp;|--- main.py <br>
 |&nbsp;&nbsp;&nbsp;&nbsp;|--- utilities <br>
 |&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;|--- manage_txt_file.py <br>
-|&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;|--- simulation_config. <br>
+|&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;|--- simulation_config.py <br>
 |&nbsp;&nbsp;&nbsp;&nbsp;|--- back_trader <br>
 |&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;|--- fetch_data_for_bt.py <br>
 |&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;|--- strategy <br>
