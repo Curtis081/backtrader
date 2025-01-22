@@ -15,6 +15,6 @@
 |&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;|--- buy_and_hold.py <br>
 |&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;|--- vix.py <br>
 
-### Module Introduction
+### Python module introduction
 backtrader: https://www.backtrader.com/docu/ <br>
 yfinance: https://pypi.org/project/yfinance/ <br>
